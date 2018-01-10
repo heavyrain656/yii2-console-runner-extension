@@ -41,6 +41,11 @@ class ConsoleRunner extends Component
     public $file;
 
     /**
+     * @var string $phpBinaryPath Path to php binary (optional)
+     */
+    public $phpBinaryPath;
+
+    /**
      * @inheritdoc
      */
     public function init()
@@ -50,6 +55,7 @@ class ConsoleRunner extends Component
         if ($this->file === null) {
             throw new InvalidConfigException('The "file" property must be set.');
         }
+        $this->phpBinaryPath = $this->phpBinaryPath ?: $this->getDefaultPhpBinaryPath();
     }
 
     /**
@@ -60,12 +66,12 @@ class ConsoleRunner extends Component
      */
     public function run($cmd)
     {
-        $cmd = PHP_BINARY . ' ' . Yii::getAlias($this->file) . ' ' . $cmd;
-        if ($this->isWindows() === true) {
-            pclose(popen('start /b ' . $cmd, 'r'));
-        } else {
-            pclose(popen($cmd . ' > /dev/null 2>&1 &', 'r'));
-        }
+        $executableFilePath = \Yii::getAlias($this->file);
+        $command = "{$this->phpBinaryPath} $executableFilePath $cmd";
+        $systemDependentCommand = ($this->isWindows()) ? "start /b $command" : "$command > /dev/null 2>&1 &";
+
+        pclose(popen($systemDependentCommand, "r"));
+
         return true;
     }
 
@@ -81,5 +87,15 @@ class ConsoleRunner extends Component
         } else {
             return false;
         }
+    }
+
+    /**
+     * Default path to php binary
+     *
+     * @return string
+     */
+    private function getDefaultPhpBinaryPath()
+    {
+        return PHP_BINARY;
     }
 }
