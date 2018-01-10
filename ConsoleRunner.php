@@ -23,7 +23,8 @@ use yii\base\InvalidConfigException;
  * components [
  *     'consoleRunner' => [
  *         'class' => 'vova07\console\ConsoleRunner',
- *         'file' => '@my/path/to/yii' // or an absolute path to console file
+ *         'file' => '@my/path/to/yii', // or an absolute path to console file
+ *         'phpBinaryPath' => '/usr/bin/php'
  *     ]
  * ]
  * ...
